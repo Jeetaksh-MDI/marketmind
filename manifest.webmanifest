@@ -1,0 +1,10 @@
+{
+  "name":"MarketMind",
+  "short_name":"MarketMind",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#090d18",
+  "theme_color":"#0b1020",
+  "description":"Play an economy. Discover your Economic Decision Profile.",
+  "icons":[]
+}

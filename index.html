@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="MarketMind is an interactive behavioral economics simulation that reveals your Economic Decision Profile from the choices you make." />
+  <meta property="og:title" content="MarketMind — Play your economy. Discover your decision personality." />
+  <meta property="og:description" content="No personality questions. We give you an economy and see what you do with it." />
+  <meta property="og:type" content="website" />
+  <title>MarketMind — Economic Decision Personality</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="MarketMind home">
+      <span class="brand-mark">M</span>
+      <span>MarketMind</span>
+    </a>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">◐</button>
+      <button class="ghost small" id="restartBtn" type="button" hidden>Restart</button>
+    </div>
+  </header>
+
+  <main id="app" class="app-shell">
+    <section id="landing" class="view active">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">BEHAVIORAL ECONOMICS × SIMULATION × DECISION SCIENCE</div>
+          <h1>Don't tell us your personality.<br><span>Show us how you decide.</span></h1>
+          <p class="hero-sub">Step inside a short economic simulation. Spend, price, invest, compete and trade off. At the end, we'll decode your choices into a shareable <strong>Economic Decision Profile</strong>.</p>
+
+          <div class="hero-pills" aria-label="Simulation highlights">
+            <span>≈ 8 minutes</span><span>No signup</span><span>No right answers</span><span>9 live decisions</span>
+          </div>
+
+          <form id="startForm" class="start-card" novalidate>
+            <label for="nameInput">What should we call you?</label>
+            <div class="name-row">
+              <input id="nameInput" name="name" type="text" minlength="2" maxlength="40" autocomplete="name" placeholder="Your first name" required />
+              <button class="primary" type="submit">Play my economy <span>→</span></button>
+            </div>
+            <label class="consent-row">
+              <input id="consentInput" type="checkbox" required />
+              <span>I agree to store my name and anonymous simulation choices to generate my result and measure game usage. <a href="/privacy.html">Privacy</a></span>
+            </label>
+            <p class="form-error" id="startError" role="alert"></p>
+          </form>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+          <div class="profile-card floating">
+            <div class="mini-kicker">ECONOMIC DNA</div>
+            <div class="mini-title">Strategic Optimizer</div>
+            <div class="mini-bars">
+              <div><span>Risk</span><i style="--v:72%"></i><b>72</b></div>
+              <div><span>Patience</span><i style="--v:84%"></i><b>84</b></div>
+              <div><span>Independence</span><i style="--v:79%"></i><b>79</b></div>
+              <div><span>Social</span><i style="--v:61%"></i><b>61</b></div>
+            </div>
+          </div>
+          <div class="signal-card signal-one">₹ <b>+18.4%</b><span>Portfolio move</span></div>
+          <div class="signal-card signal-two">♟ <b>9 choices</b><span>One profile</span></div>
+        </div>
+      </div>
+
+      <div class="proof-strip">
+        <div><b>Not a quiz.</b><span>Your inputs are continuous, contextual and stateful.</span></div>
+        <div><b>Not a horoscope.</b><span>Every result cites the decisions that produced it.</span></div>
+        <div><b>Not AI-generated.</b><span>The engine is deterministic, explainable and reproducible.</span></div>
+      </div>
+
+      <section class="how-it-works">
+        <div class="section-head"><span>HOW IT WORKS</span><h2>One simulation. Three layers.</h2></div>
+        <div class="steps-grid">
+          <article><em>01</em><h3>Make real trade-offs</h3><p>Use sliders, budgets and allocations instead of obvious personality-test questions.</p></article>
+          <article><em>02</em><h3>The world reacts</h3><p>Your cash, portfolio, business, reputation and social impact change after every decision.</p></article>
+          <article><em>03</em><h3>Decode your behavior</h3><p>See your archetype, trait scores, confidence, economic concepts and exactly why each choice mattered.</p></article>
+        </div>
+      </section>
+
+      <section class="creator-panel">
+        <div class="creator-mark">JG</div>
+        <div>
+          <div class="eyebrow">BUILT BY JEETAKSH GANDHI</div>
+          <h3>Economics, decision science and engineering — in one experiment.</h3>
+          <p>PGDM (Banking & Financial Services), MDI Gurgaon 2026–28 · B.Tech CSE, LNMIIT 2021–25 · experience across Innovaccer, Shipd by Datacurve (YC W24) and the LeetCode community.</p>
+        </div>
+        <a class="secondary" href="https://www.linkedin.com/in/jeetaksh/" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      </section>
+    </section>
+
+    <section id="game" class="view" aria-live="polite">
+      <div class="game-top">
+        <div class="progress-wrap">
+          <div class="progress-copy"><span id="roundLabel">Decision 1 of 9</span><span id="progressPct">11%</span></div>
+          <div class="progress-track"><div id="progressFill"></div></div>
+        </div>
+        <div class="world-stats" id="worldStats"></div>
+      </div>
+      <div id="scenarioMount"></div>
+    </section>
+
+    <section id="result" class="view">
+      <div class="result-hero">
+        <div>
+          <div class="eyebrow">YOUR ECONOMIC DECISION PROFILE</div>
+          <p class="result-name" id="resultName"></p>
+          <h1 id="archetypeTitle"></h1>
+          <p id="archetypeBlurb" class="result-blurb"></p>
+          <div class="result-actions">
+            <button class="primary" id="downloadCardBtn" type="button">Download report card</button>
+            <button class="secondary" id="shareCardBtn" type="button">Share profile</button>
+          </div>
+        </div>
+        <div class="score-orb" id="scoreOrb">
+          <span>ECONOMIC<br>DNA</span>
+          <strong id="profileCode">—</strong>
+        </div>
+      </div>
+
+      <section class="results-section">
+        <div class="section-head"><span>YOUR TRAITS</span><h2>How you tend to decide</h2></div>
+        <div id="traitGrid" class="trait-grid"></div>
+      </section>
+
+      <section class="results-section">
+        <div class="section-head"><span>YOUR WORLD</span><h2>Where your simulation ended</h2></div>
+        <div id="finalWorld" class="final-world"></div>
+      </section>
+
+      <section class="results-section">
+        <div class="section-head"><span>CHOICES, DECODED</span><h2>The economics behind every decision</h2><p>These are scenario-based tendencies, not a clinical or psychological diagnosis.</p></div>
+        <div id="decisionReport" class="decision-report"></div>
+      </section>
+
+      <section class="results-section final-cta">
+        <div>
+          <span class="eyebrow">ONE MORE THING</span>
+          <h2>Think you know how your friends decide?</h2>
+          <p>Send them MarketMind and compare your Economic Decision Profiles.</p>
+        </div>
+        <button class="primary" id="shareChallengeBtn" type="button">Challenge a friend →</button>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div><strong>MarketMind</strong><span>Built as an interactive decision-science experiment.</span></div>
+    <div class="creator">Made by <a href="https://www.linkedin.com/in/jeetaksh/" target="_blank" rel="noreferrer">Jeetaksh Gandhi</a> · MDI Gurgaon 2026–28 · LNMIIT CSE 2021–25</div>
+  </footer>
+
+  <canvas id="reportCanvas" width="1080" height="1350" hidden></canvas>
+  <script src="/app.js" defer></script>
+</body>
+</html>

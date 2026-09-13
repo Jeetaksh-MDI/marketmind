@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>MarketMind Admin</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap{width:min(1080px,calc(100% - 28px));margin:40px auto 80px}.admin-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:24px}.admin-head h1{font-size:46px;letter-spacing:-.05em;margin:6px 0}.admin-login{display:flex;gap:8px;max-width:520px}.admin-login input{flex:1;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:13px 14px;min-width:0}.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.kpi{padding:22px;border:1px solid var(--line);border-radius:20px;background:var(--card)}.kpi span{color:var(--muted);font-size:12px}.kpi b{display:block;font-size:38px;letter-spacing:-.04em;margin-top:5px}.admin-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}.admin-card{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:20px;overflow:auto}.admin-card h2{margin:0 0 14px;font-size:19px}.archetype-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.archetype-row:first-of-type{border-top:0}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.table th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}.muted{color:var(--muted)}.error{color:var(--rose);margin:12px 0}.admin-note{color:var(--muted);font-size:12px;line-height:1.5}@media(max-width:800px){.kpis,.admin-grid{grid-template-columns:1fr}.admin-head{align-items:flex-start;flex-direction:column}.admin-login{width:100%}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">M</span><span>MarketMind</span></a><a class="ghost" href="/">Back to game</a></header>
+  <main class="admin-wrap">
+    <div class="admin-head">
+      <div><div class="eyebrow">PRIVATE DASHBOARD</div><h1>Play analytics</h1><p class="muted">Names are shown only here. Keep your admin key private.</p></div>
+      <div class="admin-login"><input id="adminKey" type="password" autocomplete="current-password" placeholder="ADMIN_KEY"/><button class="primary" id="loadBtn" type="button">Load</button></div>
+    </div>
+    <p id="error" class="error"></p>
+    <section id="dashboard" hidden>
+      <div class="kpis"><div class="kpi"><span>Started</span><b id="started">0</b></div><div class="kpi"><span>Completed</span><b id="completed">0</b></div><div class="kpi"><span>Completion rate</span><b id="rate">0%</b></div></div>
+      <div class="admin-grid">
+        <div class="admin-card"><h2>Personality mix</h2><div id="archetypes"></div><p class="admin-note" id="sample"></p></div>
+        <div class="admin-card"><h2>Recent players</h2><div style="overflow:auto"><table class="table"><thead><tr><th>Name</th><th>Status</th><th>Round</th><th>Type</th><th>Started</th></tr></thead><tbody id="recent"></tbody></table></div></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const keyInput=document.querySelector('#adminKey'),btn=document.querySelector('#loadBtn'),err=document.querySelector('#error'),dash=document.querySelector('#dashboard');
+    function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+    async function load(){err.textContent='';btn.disabled=true;try{const r=await fetch('/api/admin',{headers:{'x-admin-key':keyInput.value}});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not load analytics');document.querySelector('#started').textContent=d.totalStarted.toLocaleString('en-IN');document.querySelector('#completed').textContent=d.totalCompleted.toLocaleString('en-IN');document.querySelector('#rate').textContent=d.completionRate+'%';const pairs=Object.entries(d.archetypeCounts||{}).sort((a,b)=>b[1]-a[1]);document.querySelector('#archetypes').innerHTML=pairs.length?pairs.map(([k,v])=>`<div class="archetype-row"><span>${esc(k)}</span><b>${v}</b></div>`):'<p class="muted">No completed profiles yet.</p>';document.querySelector('#sample').textContent=`Personality mix uses the latest ${d.archetypeSampleSize||0} completed sessions.`;document.querySelector('#recent').innerHTML=(d.recent||[]).map(x=>`<tr><td>${esc(x.name)}</td><td>${x.completed?'Completed':'Playing'}</td><td>${x.current_round}/9</td><td>${esc(x.personality_type||'—')}</td><td>${x.started_at?new Date(x.started_at).toLocaleString():'—'}</td></tr>`).join('');dash.hidden=false;}catch(e){err.textContent=e.message;}finally{btn.disabled=false;}}
+    btn.addEventListener('click',load);keyInput.addEventListener('keydown',e=>{if(e.key==='Enter')load();});
+  </script>
+</body>
+</html>
